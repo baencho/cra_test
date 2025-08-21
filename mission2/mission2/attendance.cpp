@@ -118,7 +118,7 @@ public:
 	}
 
 	void getInputAndUpdateAttendance() {
-		string filename = "attendance_weekday_500.txt";
+		string filename = "C:\\Users\\User\\Desktop\\test\\mission2\\mission2\\attendance_weekday_500.txt";;
 		ifstream fin{ filename }; //500개 데이터 입력
 		for (int i = 0; i < 500; i++) {
 			string name, attendDay;
