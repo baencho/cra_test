@@ -1,12 +1,11 @@
 #include <string>
 #include "player.h"
-
+#include "grade.h"
 using namespace std;
 
 Player::Player(string name, int id) {
 	this->name = name;
 	this->id = id;
-	this->grade = 0;
 	this->point = 0;
 	for (int i = 0; i < 7; i++)
 	{
@@ -18,24 +17,23 @@ string Player::getName(void)
 {
 	return name;
 }
+
 int Player::getId(void) {
 	return id;
 }
+
 int Player::getPoint(void) {
 	return point;
 }
+
 void Player::addPoint(int value)
 {
 	point += value;
 }
+
 int Player::getGrade()
 {
-	return grade;
-}
-
-void Player::setGrade(int grade)
-{
-	this->grade = grade;
+	return PointGrade(point).getGrade();
 }
 
 void Player::updatePoint(int day)

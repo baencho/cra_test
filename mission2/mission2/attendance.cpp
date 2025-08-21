@@ -7,6 +7,7 @@
 #include <exception>
 #include "gmock/gmock.h"
 #include "player.h"
+#include "grade.h"
 
 using namespace std;
 #define OP_TEST (1)
@@ -26,12 +27,6 @@ enum eDay {
 	eDayError = 7
 };
 
-enum eGrade {
-	eNormal = 0,
-	eGold = 1,
-	eSilver = 2
-};
-
 map<string, Player*> playerMap;
 
 string getGradeInString(int grade)
@@ -45,12 +40,6 @@ string getGradeInString(int grade)
 	else {
 		return "NORMAL";
 	}
-}
-
-int getPointPerDay(int id, int day)
-{
-	const int pointPerDay[MAX_DAYS] = { 1, 1, 3, 1, 1, 2, 2 };
-	return pointPerDay[day];
 }
 
 eDay convertDayStringToInt(string day)
@@ -110,25 +99,6 @@ void addExtraAttendancePointsWithPlayerMap()
 	}
 }
 
-void updateGradeTableWithPlayerMap() {
-	const int GOLD_MINIMUM_POINT = 50;
-	const int SILVER_MINIMUM_POINT = 30;
-
-	for (auto iter = playerMap.begin(); iter != playerMap.end(); iter++)
-	{
-		Player* player = iter->second;
-		if (player->getPoint() >= GOLD_MINIMUM_POINT) {
-			player->setGrade(eGold);
-		}
-		else if (player->getPoint() >= SILVER_MINIMUM_POINT) {
-			player->setGrade(eSilver);
-		}
-		else {
-			player->setGrade(eNormal);
-		}
-	}
-}
-
 void printPointAndGrade() {
 	for (auto iter = playerMap.begin(); iter != playerMap.end(); iter++)
 	{
@@ -175,8 +145,6 @@ void input(string filename) {
 	}
 
 	addExtraAttendancePointsWithPlayerMap();
-
-	updateGradeTableWithPlayerMap();
 
 	// Print results
 	printPointAndGrade();
@@ -289,8 +257,6 @@ TEST_F(TestFixture, CheckGradeWellCalculated)
 			updateAttendance(name, attendDay);
 		}
 		addExtraAttendancePointsWithPlayerMap();
-
-		updateGradeTableWithPlayerMap();
 	}
 	catch (exception e) {
 		std::cout << e.what() << "\n";

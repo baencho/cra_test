@@ -12,8 +12,6 @@ public:
 	int getPoint(void);
 	void addPoint(int value);
 	int getGrade();
-	void setGrade(int grade);
-	
 
 	void updatePoint(int day);
 	void updateAttendance(int day);
@@ -23,6 +21,5 @@ private:
 	string name;
 	int id;
 	int point;
-	int grade;
 	int attendPerDay[7] = { 0, 0, 0, 0, 0, 0, 0 };
 };
