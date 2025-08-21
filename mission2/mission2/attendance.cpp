@@ -195,6 +195,20 @@ void addExtraAttendancePoints()
 	}
 }
 
+void addExtraAttendancePointsWithPlayerMap()
+{
+	for (auto iter = playerMap.begin(); iter != playerMap.end(); iter++)
+	{
+		Player* player = iter->second;
+		if (player->getAttendance(eWednesday) > 9) {
+			player->addPoint(10);
+		}
+		if (player->getAttendance(eSaturday) + player->getAttendance(eSunday) > 9) {
+			player->addPoint(10);
+		}
+	}
+}
+
 void updateGradeTable() {
 	const int GOLD_MINIMUM_POINT = 50;
 	const int SILVER_MINIMUM_POINT = 30;
@@ -208,6 +222,25 @@ void updateGradeTable() {
 		}
 		else {
 			grade[id] = eNormal;
+		}
+	}
+}
+
+void updateGradeTableWithPlayerMap() {
+	const int GOLD_MINIMUM_POINT = 50;
+	const int SILVER_MINIMUM_POINT = 30;
+
+	for (auto iter = playerMap.begin(); iter != playerMap.end(); iter++)
+	{
+		Player* player = iter->second;
+		if (player->getPoint() >= GOLD_MINIMUM_POINT) {
+			player->setGrade(eGold);
+		}
+		else if (player->getPoint() >= SILVER_MINIMUM_POINT) {
+			player->setGrade(eSilver);
+		}
+		else {
+			player->setGrade(eNormal);
 		}
 	}
 }
@@ -261,6 +294,7 @@ void input(string filename) {
 
 void ResetAllData(){
 	idMap.clear();
+	playerMap.clear();
 	idCount = 0;
 
 	//dat[사용자ID][요일]
@@ -329,6 +363,66 @@ TEST_F(TestFixture, CheckUpdateAttendance)
 	EXPECT_EQ("Harry", playerMap["Harry"]->getName());
 	EXPECT_EQ(1, playerMap["Harry"]->getId());
 	EXPECT_EQ(1, playerMap["Harry"]->getAttendance(eWednesday));
+}
+
+TEST_F(TestFixture, CheckAttendanceInputWellManaged)
+{
+	try {
+		string filename = "attendance_weekday_500.txt";
+		ifstream fin{ filename }; //500개 데이터 입력
+		for (int i = 0; i < 500; i++) {
+			string name, attendDay;
+			fin >> name >> attendDay;
+			updateAttendance(name, attendDay);
+		}
+	}
+	catch (exception e) {
+		std::cout << e.what() << "\n";
+	}
+
+	EXPECT_EQ(19, playerMap.size());
+}
+
+TEST_F(TestFixture, CheckPointWellCalculated)
+{
+	try {
+		string filename = "attendance_weekday_500.txt";
+		ifstream fin{ filename }; //500개 데이터 입력
+		for (int i = 0; i < 500; i++) {
+			string name, attendDay;
+			fin >> name >> attendDay;
+			updateAttendance(name, attendDay);
+		}
+		addExtraAttendancePointsWithPlayerMap();
+	}
+	catch (exception e) {
+		std::cout << e.what() << "\n";
+	}
+	EXPECT_EQ(19, playerMap.size());
+	EXPECT_EQ(127, playerMap["Hannah"]->getPoint());
+}
+
+TEST_F(TestFixture, CheckGradeWellCalculated)
+{
+	try {
+		string filename = "attendance_weekday_500.txt";
+		ifstream fin{ filename }; //500개 데이터 입력
+		for (int i = 0; i < 500; i++) {
+			string name, attendDay;
+			fin >> name >> attendDay;
+			updateAttendance(name, attendDay);
+		}
+		addExtraAttendancePointsWithPlayerMap();
+
+		updateGradeTableWithPlayerMap();
+	}
+	catch (exception e) {
+		std::cout << e.what() << "\n";
+	}
+	EXPECT_EQ(19, playerMap.size());
+	EXPECT_EQ(eGold, playerMap["Hannah"]->getGrade());
+	EXPECT_EQ(eSilver, playerMap["George"]->getGrade());
+	EXPECT_EQ(eNormal, playerMap["Quinn"]->getGrade());
 }
 
 int main() {

@@ -7,7 +7,11 @@ Player::Player(string name, int id) {
 	this->name = name;
 	this->id = id;
 	this->grade = 0;
-	memset(this->attendPerDay, 0, sizeof(int) * 7);
+	this->point = 0;
+	for (int i = 0; i < 7; i++)
+	{
+		this->attendPerDay[i] = 0;
+	}
 }
 
 string Player::getName(void)
@@ -20,9 +24,18 @@ int Player::getId(void) {
 int Player::getPoint(void) {
 	return point;
 }
+void Player::addPoint(int value)
+{
+	point += value;
+}
 int Player::getGrade()
 {
 	return grade;
+}
+
+void Player::setGrade(int grade)
+{
+	this->grade = grade;
 }
 
 void Player::updatePoint(int day)
