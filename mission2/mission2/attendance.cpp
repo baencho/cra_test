@@ -154,10 +154,6 @@ void input(string filename) {
 	printRemovedPlayers();
 }
 
-void ResetAllData(){
-	playerMap.clear();
-}
-
 class TestFixture : public ::testing::Test
 {
 public:
