@@ -4,6 +4,7 @@
 #include <vector>
 #include <map>
 #include <algorithm>
+#include <exception>
 #include "gmock/gmock.h"
 
 using namespace std;
@@ -27,7 +28,7 @@ enum eDay {
 	eSaturday,
 	eSunday,
 
-	eError = 7
+	eDayError = 7
 };
 
 enum eGrade {
@@ -65,7 +66,7 @@ int getId(string name)
 
 int getPoint(int id, int day)
 {
-	const int pointPerDay[7] = { 1, 1, 3, 1, 1, 2, 2 };
+	const int pointPerDay[MAX_DAYS] = { 1, 1, 3, 1, 1, 2, 2 };
 	return pointPerDay[day];
 }
 
@@ -93,28 +94,40 @@ eDay convertDayStringToInt(string day)
 		return eSunday;
 	}
 
-	return eError;
+	return eDayError;
 }
 
 void updatePointTable(int id, int day) {
+	if (id < 0 || id >= MAX_PLAYERS) throw exception("[updatePointTable] id overflow exception");
+	if (day < eMonday || day >= eDayError) throw exception("[updatePointTable] day overflow exception");
+
 	points[id] += getPoint(id, day);
 }
 
 void updateExtraAttendanceTable(int id, int day)
 {
+	if (id < 0 || id >= MAX_PLAYERS) throw exception("[updateExtraAttendanceTable] id overflow exception");
+	if (day < eMonday || day >= eDayError) throw exception("[updateExtraAttendanceTable] day overflow exception");
+
 	if (day == eWednesday) {
 		wednesdayAttendance[id] += 1;
 	}
-	if (day == eSaturday) {
+	else if (day == eSaturday) {
 		weekendAttendance[id] += 1;
 	}
-	if (day == eSunday) {
+	else if (day == eSunday) {
 		weekendAttendance[id] += 1;
+	}
+	else {
+		// do nothing
 	}
 }
 
 void updateAttendanceCountPerDayTable(int id, int day)
 {
+	if (id < 0 || id >= MAX_PLAYERS) throw exception("[updateAttendanceCountPerDayTable] id overflow exception");
+	if (day < eMonday || day >= eDayError) throw exception("[updateAttendanceCountPerDayTable] day overflow exception");
+
 	attendanceCountPerDay[id][day] += 1;
 }
 
@@ -149,11 +162,14 @@ void addExtraAttendancePoints()
 }
 
 void updateGradeTable() {
+	const int GOLD_MINIMUM_POINT = 50;
+	const int SILVER_MINIMUM_POINT = 30;
+
 	for (int id = 1; id <= idCount; id++) {
-		if (points[id] >= 50) {
+		if (points[id] >= GOLD_MINIMUM_POINT) {
 			grade[id] = eGold;
 		}
-		else if (points[id] >= 30) {
+		else if (points[id] >= SILVER_MINIMUM_POINT) {
 			grade[id] = eSilver;
 		}
 		else {
@@ -211,7 +227,7 @@ void printRemovedPlayers() {
 	std::cout << "==============\n";
 	for (int id = 1; id <= idCount; id++) {
 		if (checkGradeNormal(id) && checkAttendanceNotEnough(id)) {
-			std::cout << names[id] << "\n";
+			std::cout << getName(id) << "\n";
 		}
 	}
 }
@@ -238,7 +254,12 @@ int main() {
 	::testing::InitGoogleMock();
 	return RUN_ALL_TESTS();
 #else
-	string filename = "attendance_weekday_500.txt";
-	input(filename);
+	try {
+		string filename = "attendance_weekday_500.txt";
+		input(filename);
+	}
+	catch (exception e){
+		std::cout << e.what() << "\n";
+	}
 #endif
 }
