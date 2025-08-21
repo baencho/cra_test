@@ -50,12 +50,12 @@ string names[MAX_PLAYERS];
 int wednesdayAttendance[MAX_PLAYERS];
 int weekendAttendance[MAX_PLAYERS];
 
-string getGradeInString(int id)
+string getGradeInString(int grade)
 {
-	if (grade[id] == eGold) {
+	if (grade == eGold) {
 		return "GOLD";
 	}
-	else if (grade[id] == eSilver) {
+	else if (grade == eSilver) {
 		return "SILVER";
 	}
 	else {
@@ -182,19 +182,6 @@ void updateAttendance(string name, string dayInString) {
 	player->updatePoint(dayInInt);
 }
 
-void addExtraAttendancePoints()
-{
-	for (int id = 1; id <= idCount; id++) {
-		if (attendanceCountPerDay[id][eWednesday] > 9) {
-			points[id] += 10;
-		}
-
-		if (attendanceCountPerDay[id][eSaturday] + attendanceCountPerDay[id][eSunday] > 9) {
-			points[id] += 10;
-		}
-	}
-}
-
 void addExtraAttendancePointsWithPlayerMap()
 {
 	for (auto iter = playerMap.begin(); iter != playerMap.end(); iter++)
@@ -205,23 +192,6 @@ void addExtraAttendancePointsWithPlayerMap()
 		}
 		if (player->getAttendance(eSaturday) + player->getAttendance(eSunday) > 9) {
 			player->addPoint(10);
-		}
-	}
-}
-
-void updateGradeTable() {
-	const int GOLD_MINIMUM_POINT = 50;
-	const int SILVER_MINIMUM_POINT = 30;
-
-	for (int id = 1; id <= idCount; id++) {
-		if (points[id] >= GOLD_MINIMUM_POINT) {
-			grade[id] = eGold;
-		}
-		else if (points[id] >= SILVER_MINIMUM_POINT) {
-			grade[id] = eSilver;
-		}
-		else {
-			grade[id] = eNormal;
 		}
 	}
 }
@@ -246,32 +216,39 @@ void updateGradeTableWithPlayerMap() {
 }
 
 void printPointAndGrade() {
-	for (int id = 1; id <= idCount; id++) {
-		cout << "NAME : " << getName(id) << ", ";
-		cout << "POINT : " << getPoint(id) << ", ";
-		cout << "GRADE : " << getGradeInString(id) << "\n";
+	for (auto iter = playerMap.begin(); iter != playerMap.end(); iter++)
+	{
+		Player* player = iter->second;
+		cout << "NAME : " << player->getName() << ", ";
+		cout << "POINT : " << player->getPoint() << ", ";
+		cout << "GRADE : " << getGradeInString(player->getGrade()) << "\n";
 	}
 	std::cout << "\n";
 }
 
-bool checkGradeNormal(int id)
+bool checkGradeNormal(Player* player)
 {
-	if (grade[id] != eGold && grade[id] != eSilver) return true;
+	int grade = player->getGrade();
+	if (grade == eNormal) return true;
 	return false;
 }
 
-bool checkAttendanceNotEnough(int id)
+bool checkAttendanceNotEnough(Player* player)
 {
-	if (wednesdayAttendance[id] == 0 && weekendAttendance[id] == 0) return true;
+	int wednesdayAttendance = player->getAttendance(eWednesday);
+	int weekendAttendance = player->getAttendance(eSaturday) + player->getAttendance(eSunday);
+	if (wednesdayAttendance == 0 && weekendAttendance == 0) return true;
 	return false;
 }
 
 void printRemovedPlayers() {
 	std::cout << "Removed player\n";
 	std::cout << "==============\n";
-	for (int id = 1; id <= idCount; id++) {
-		if (checkGradeNormal(id) && checkAttendanceNotEnough(id)) {
-			std::cout << getName(id) << "\n";
+	for (auto iter = playerMap.begin(); iter != playerMap.end(); iter++)
+	{
+		Player* player = iter->second;
+		if (checkGradeNormal(player) && checkAttendanceNotEnough(player)) {
+			std::cout << player->getName() << "\n";
 		}
 	}
 }
@@ -280,12 +257,12 @@ void input(string filename) {
 	for (int i = 0; i < 500; i++) {
 		string name, attendDay;
 		fin >> name >> attendDay;
-		updateAttendanceAndPointTable(name, attendDay);
+		updateAttendance(name, attendDay);
 	}
 
-	addExtraAttendancePoints();
+	addExtraAttendancePointsWithPlayerMap();
 
-	updateGradeTable();
+	updateGradeTableWithPlayerMap();
 
 	// Print results
 	printPointAndGrade();
