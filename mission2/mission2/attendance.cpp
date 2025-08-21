@@ -10,9 +10,7 @@
 #include "grade.h"
 
 using namespace std;
-#define OP_TEST (1)
-
-map<string, Player*> playerMap;
+#define OP_TEST (0)
 
 class StringConverter {
 private:
@@ -57,7 +55,7 @@ public:
 	}
 };
 
-class PlayerFactory
+class AttendanceManager
 {
 public:
 	map<string, Player*> playerMap;
@@ -105,61 +103,25 @@ public:
 	}
 };
 
-Player* getPlayer(string name)
-{
-	if (playerMap.count(name) == 0) {
-		//insert in map
-		playerMap.insert({ name, new Player(name, playerMap.size() + 1) });
-	}
-	return playerMap[name];
-}
-
-void updateAttendance(string name, string dayInString) {
-	int dayInInt = StringConverter::getInstance()->convertDayStringToInt(dayInString);
-	Player* player = getPlayer(name);
-	player->updateAttendance(dayInInt);
-}
-
-void printPointAndGrade() {
-	for (auto iter = playerMap.begin(); iter != playerMap.end(); iter++)
-	{
-		Player* player = iter->second;
-		cout << "NAME : " << player->getName() << ", ";
-		cout << "POINT : " << player->calculateFinalPoint() << ", ";
-		cout << "GRADE : " << StringConverter::getInstance()->getGradeInString(player->getGrade()) << "\n";
-	}
-	std::cout << "\n";
-}
-
-void printRemovedPlayers() {
-	std::cout << "Removed player\n";
-	std::cout << "==============\n";
-	for (auto iter = playerMap.begin(); iter != playerMap.end(); iter++)
-	{
-		Player* player = iter->second;
-		if (player->checkGradeNormal() && player->checkAttendanceNotEnough()) {
-			std::cout << player->getName() << "\n";
-		}
-	}
-}
 void input(string filename) {
+	AttendanceManager manager;
 	ifstream fin{ filename }; //500개 데이터 입력
 	for (int i = 0; i < 500; i++) {
 		string name, attendDay;
 		fin >> name >> attendDay;
-		updateAttendance(name, attendDay);
+		manager.updateAttendance(name, attendDay);
 	}
 
-	printPointAndGrade();
-	printRemovedPlayers();
+	manager.printPointAndGrade();
+	manager.printRemovedPlayers();
 }
 
 class TestFixture : public ::testing::Test
 {
 public:
-	PlayerFactory* factory;
+	AttendanceManager* factory;
 	void SetUp() override {
-		factory = new PlayerFactory();
+		factory = new AttendanceManager();
 	}
 
 	void TearDown() override {
@@ -279,7 +241,7 @@ TEST_F(TestFixture, CheckAttendanceNormal)
 	EXPECT_EQ(false, p.checkAttendanceNotEnough());
 }
 int main() {
-#if (1)
+#if (OP_TEST)
 	::testing::InitGoogleMock();
 	return RUN_ALL_TESTS();
 #else
