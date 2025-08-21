@@ -6,8 +6,6 @@ using namespace std;
 Player::Player(string name, int id) {
 	this->name = name;
 	this->id = id;
-	this->point = 0;
-	this->finalPoint = 0;
 	for (int i = 0; i < 7; i++)
 	{
 		this->attendPerDay[i] = 0;
@@ -23,18 +21,9 @@ int Player::getId(void) {
 	return id;
 }
 
-int Player::getPoint(void) {
-	return point;
-}
-
-void Player::addPoint(int value)
-{
-	point += value;
-}
-
 int Player::getGrade()
 {
-	return PointGrade(point).getGrade();
+	return PointGrade(calculateFinalPoint()).getGrade();
 }
 
 void Player::updatePoint(int day)
@@ -55,6 +44,7 @@ int Player::getAttendance(int day)
 
 int Player::calculateFinalPoint()
 {
+	int finalPoint = 0;
 	const int pointPerDay[7] = { 1, 1, 3, 1, 1, 2, 2 };
 	for (int i = 0; i < 7; i++) {
 		finalPoint += attendPerDay[i] * pointPerDay[i];

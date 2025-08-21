@@ -71,21 +71,6 @@ void updateAttendance(string name, string dayInString) {
 	int dayInInt = convertDayStringToInt(dayInString);
 	Player* player = getPlayer(name);
 	player->updateAttendance(dayInInt);
-	player->updatePoint(dayInInt);
-}
-
-void addExtraAttendancePointsWithPlayerMap()
-{
-	for (auto iter = playerMap.begin(); iter != playerMap.end(); iter++)
-	{
-		Player* player = iter->second;
-		if (player->getAttendance(eWednesday) > 9) {
-			player->addPoint(10);
-		}
-		if (player->getAttendance(eSaturday) + player->getAttendance(eSunday) > 9) {
-			player->addPoint(10);
-		}
-	}
 }
 
 void printPointAndGrade() {
@@ -93,7 +78,7 @@ void printPointAndGrade() {
 	{
 		Player* player = iter->second;
 		cout << "NAME : " << player->getName() << ", ";
-		cout << "POINT : " << player->getPoint() << ", ";
+		cout << "POINT : " << player->calculateFinalPoint() << ", ";
 		cout << "GRADE : " << getGradeInString(player->getGrade()) << "\n";
 	}
 	std::cout << "\n";
@@ -133,7 +118,7 @@ void input(string filename) {
 		updateAttendance(name, attendDay);
 	}
 
-	addExtraAttendancePointsWithPlayerMap();
+	//addExtraAttendancePointsWithPlayerMap();
 
 	// Print results
 	printPointAndGrade();
@@ -226,13 +211,12 @@ TEST_F(TestFixture, CheckPointWellCalculated)
 			fin >> name >> attendDay;
 			updateAttendance(name, attendDay);
 		}
-		addExtraAttendancePointsWithPlayerMap();
 	}
 	catch (exception e) {
 		std::cout << e.what() << "\n";
 	}
 	EXPECT_EQ(19, playerMap.size());
-	EXPECT_EQ(127, playerMap["Hannah"]->getPoint());
+	EXPECT_EQ(127, playerMap["Hannah"]->calculateFinalPoint());
 }
 
 TEST_F(TestFixture, CalculateOnceTest)
@@ -243,9 +227,7 @@ TEST_F(TestFixture, CalculateOnceTest)
 		for (int i = 0; i < 500; i++) {
 			string name, attendDay;
 			fin >> name >> attendDay;
-			int dayInInt = convertDayStringToInt(attendDay);
-			Player* player = getPlayer(name);
-			player->updateAttendance(dayInInt);
+			updateAttendance(name, attendDay);
 		}
 	}
 	catch (exception e) {
@@ -265,7 +247,6 @@ TEST_F(TestFixture, CheckGradeWellCalculated)
 			fin >> name >> attendDay;
 			updateAttendance(name, attendDay);
 		}
-		addExtraAttendancePointsWithPlayerMap();
 	}
 	catch (exception e) {
 		std::cout << e.what() << "\n";
