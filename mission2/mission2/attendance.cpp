@@ -10,7 +10,7 @@
 #include "grade.h"
 
 using namespace std;
-#define OP_TEST (0)
+#define OP_TEST (1)
 
 class StringConverter {
 private:
@@ -119,13 +119,13 @@ void input(string filename) {
 class TestFixture : public ::testing::Test
 {
 public:
-	AttendanceManager* factory;
+	AttendanceManager* manager;
 	void SetUp() override {
-		factory = new AttendanceManager();
+		manager = new AttendanceManager();
 	}
 
 	void TearDown() override {
-		delete(factory);
+		delete(manager);
 	}
 
 	void getInputAndUpdateAttendance() {
@@ -134,7 +134,7 @@ public:
 		for (int i = 0; i < 500; i++) {
 			string name, attendDay;
 			fin >> name >> attendDay;
-			factory->updateAttendance(name, attendDay);
+			manager->updateAttendance(name, attendDay);
 		}
 	}
 };
@@ -162,57 +162,57 @@ TEST_F(TestFixture, CheckRemovedPlayersRight)
 
 TEST_F(TestFixture, CheckGetIdProcess)
 {
-	Player* player = factory->getPlayer("Ian");
-	Player* player2 = factory->getPlayer("Ian"); // expect same id
-	Player* player3 = factory->getPlayer("Susan");
+	Player* player = manager->getPlayer("Ian");
+	Player* player2 = manager->getPlayer("Ian"); // expect same id
+	Player* player3 = manager->getPlayer("Susan");
 
 	EXPECT_EQ(1, player->getId());
 	EXPECT_EQ(1, player2->getId());
 	EXPECT_EQ(2, player3->getId());
-	EXPECT_EQ(2, factory->getPlayerMapSize());
+	EXPECT_EQ(2, manager->getPlayerMapSize());
 }
 
 TEST_F(TestFixture, CheckUpdateAttendance)
 {
-	factory->updateAttendance("Harry", "wednesday");
+	manager->updateAttendance("Harry", "wednesday");
 
-	EXPECT_EQ(1, factory->getPlayerMapSize());
-	EXPECT_EQ("Harry", factory->getPlayer("Harry")->getName());
-	EXPECT_EQ(1, factory->getPlayer("Harry")->getId());
-	EXPECT_EQ(1, factory->getPlayer("Harry")->getAttendance(eWednesday));
+	EXPECT_EQ(1, manager->getPlayerMapSize());
+	EXPECT_EQ("Harry", manager->getPlayer("Harry")->getName());
+	EXPECT_EQ(1, manager->getPlayer("Harry")->getId());
+	EXPECT_EQ(1, manager->getPlayer("Harry")->getAttendance(eWednesday));
 }
 
 TEST_F(TestFixture, CheckAttendanceInputWellManaged)
 {
 	getInputAndUpdateAttendance();
 
-	EXPECT_EQ(19, factory->getPlayerMapSize());
+	EXPECT_EQ(19, manager->getPlayerMapSize());
 }
 
 TEST_F(TestFixture, CheckPointWellCalculated)
 {
 	getInputAndUpdateAttendance();
 
-	EXPECT_EQ(19, factory->getPlayerMapSize());
-	EXPECT_EQ(127, factory->playerMap["Hannah"]->calculateFinalPoint());
+	EXPECT_EQ(19, manager->getPlayerMapSize());
+	EXPECT_EQ(127, manager->playerMap["Hannah"]->calculateFinalPoint());
 }
 
 TEST_F(TestFixture, CalculateOnceTest)
 {
 	getInputAndUpdateAttendance();
 
-	EXPECT_EQ(19, factory->getPlayerMapSize());
-	EXPECT_EQ(127, factory->playerMap["Hannah"]->calculateFinalPoint());
+	EXPECT_EQ(19, manager->getPlayerMapSize());
+	EXPECT_EQ(127, manager->playerMap["Hannah"]->calculateFinalPoint());
 }
 
 TEST_F(TestFixture, CheckGradeWellCalculated)
 {
 	getInputAndUpdateAttendance();
 
-	EXPECT_EQ(19, factory->getPlayerMapSize());
-	EXPECT_EQ(eGold, factory->playerMap["Hannah"]->getGrade());
-	EXPECT_EQ(eSilver, factory->playerMap["George"]->getGrade());
-	EXPECT_EQ(eNormal, factory->playerMap["Quinn"]->getGrade());
+	EXPECT_EQ(19, manager->getPlayerMapSize());
+	EXPECT_EQ(eGold, manager->playerMap["Hannah"]->getGrade());
+	EXPECT_EQ(eSilver, manager->playerMap["George"]->getGrade());
+	EXPECT_EQ(eNormal, manager->playerMap["Quinn"]->getGrade());
 }
 
 TEST_F(TestFixture, CheckGradeNormal)
