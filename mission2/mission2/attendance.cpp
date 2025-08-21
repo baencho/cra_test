@@ -14,11 +14,6 @@ using namespace std;
 #define MAX_PLAYERS (100)
 #define MAX_DAYS (7)
 
-struct Node {
-	string name;
-	string attendDay;
-};
-
 enum eDay {
 	eMonday = 0,
 	eTuesday,
@@ -37,18 +32,7 @@ enum eGrade {
 	eSilver = 2
 };
 
-map<string, int> idMap;
 map<string, Player*> playerMap;
-int idCount = 0;
-
-//dat[사용자ID][요일]
-int attendanceCountPerDay[MAX_PLAYERS][MAX_DAYS + 1];
-int points[MAX_PLAYERS];
-int grade[MAX_PLAYERS];
-string names[MAX_PLAYERS];
-
-int wednesdayAttendance[MAX_PLAYERS];
-int weekendAttendance[MAX_PLAYERS];
 
 string getGradeInString(int grade)
 {
@@ -63,35 +47,10 @@ string getGradeInString(int grade)
 	}
 }
 
-string getName(int id)
-{
-	return names[id];
-}
-
-int getPoint(int id)
-{
-	return points[id];
-}
-
 int getPointPerDay(int id, int day)
 {
 	const int pointPerDay[MAX_DAYS] = { 1, 1, 3, 1, 1, 2, 2 };
 	return pointPerDay[day];
-}
-
-int getId(string name)
-{
-	// put given person in idMap and return his id
-	if (idMap.count(name) == 0) {
-		idMap.insert({ name, ++idCount });
-
-		if (name == "Daisy") {
-			int debug = 1;
-		}
-
-		names[idCount] = name;
-	}
-	return idMap[name];
 }
 
 eDay convertDayStringToInt(string day)
@@ -121,40 +80,6 @@ eDay convertDayStringToInt(string day)
 	return eDayError;
 }
 
-void updatePointTable(int id, int day) {
-	if (id < 0 || id >= MAX_PLAYERS) throw exception("[updatePointTable] id overflow exception");
-	if (day < eMonday || day >= eDayError) throw exception("[updatePointTable] day overflow exception");
-
-	points[id] += getPointPerDay(id, day);
-}
-
-void updateExtraAttendanceTable(int id, int day)
-{
-	if (id < 0 || id >= MAX_PLAYERS) throw exception("[updateExtraAttendanceTable] id overflow exception");
-	if (day < eMonday || day >= eDayError) throw exception("[updateExtraAttendanceTable] day overflow exception");
-
-	if (day == eWednesday) {
-		wednesdayAttendance[id] += 1;
-	}
-	else if (day == eSaturday) {
-		weekendAttendance[id] += 1;
-	}
-	else if (day == eSunday) {
-		weekendAttendance[id] += 1;
-	}
-	else {
-		// do nothing
-	}
-}
-
-void updateAttendanceCountPerDayTable(int id, int day)
-{
-	if (id < 0 || id >= MAX_PLAYERS) throw exception("[updateAttendanceCountPerDayTable] id overflow exception");
-	if (day < eMonday || day >= eDayError) throw exception("[updateAttendanceCountPerDayTable] day overflow exception");
-
-	attendanceCountPerDay[id][day] += 1;
-}
-
 Player* getPlayer(string name)
 {
 	if (playerMap.count(name) == 0) {
@@ -162,17 +87,6 @@ Player* getPlayer(string name)
 		playerMap.insert({ name, new Player(name, playerMap.size() + 1) });
 	}
 	return playerMap[name];
-}
-
-void updateAttendanceAndPointTable(string name, string dayInString) {
-	int id = getId(name);
-	int dayInInt = convertDayStringToInt(dayInString);
-
-	updatePointTable(id, dayInInt);
-
-	updateExtraAttendanceTable(id, dayInInt);
-
-	updateAttendanceCountPerDayTable(id, dayInInt);
 }
 
 void updateAttendance(string name, string dayInString) {
@@ -270,22 +184,7 @@ void input(string filename) {
 }
 
 void ResetAllData(){
-	idMap.clear();
 	playerMap.clear();
-	idCount = 0;
-
-	//dat[사용자ID][요일]
-	memset(attendanceCountPerDay, 0, sizeof(int) * MAX_PLAYERS * (MAX_DAYS + 1));
-	memset(points, 0, sizeof(int) * MAX_PLAYERS);
-	memset(grade, 0, sizeof(int) * MAX_PLAYERS);
-	
-	for (int i = 0; i < MAX_PLAYERS; i++)
-	{
-		names[i] = "";
-	}
-
-	memset(wednesdayAttendance, 0, sizeof(int) * MAX_PLAYERS);
-	memset(weekendAttendance, 0, sizeof(int) * MAX_PLAYERS);
 }
 
 class TestFixture : public ::testing::Test
@@ -323,14 +222,14 @@ TEST_F(TestFixture, CheckRemovedPlayersRight)
 
 TEST_F(TestFixture, CheckGetIdProcess)
 {
-	int id = getId("Ian");
-	int id2 = getId("Ian"); // expect same id
-	int id3 = getId("Susan");
+	Player* player = getPlayer("Ian");
+	Player* player2 = getPlayer("Ian"); // expect same id
+	Player* player3 = getPlayer("Susan");
 
-	EXPECT_EQ(1, id);
-	EXPECT_EQ(1, id2);
-	EXPECT_EQ(2, id3);
-	EXPECT_EQ(2, idCount);
+	EXPECT_EQ(1, player->getId());
+	EXPECT_EQ(1, player2->getId());
+	EXPECT_EQ(2, player3->getId());
+	EXPECT_EQ(2, playerMap.size());
 }
 
 TEST_F(TestFixture, CheckUpdateAttendance)
