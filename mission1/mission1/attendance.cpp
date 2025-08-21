@@ -7,95 +7,150 @@
 
 using namespace std;
 
+#define MAX_PLAYERS (100)
+#define MAX_DAYS (100)
+
 struct Node {
-	string w;
-	string wk;
+	string name;
+	string attendDay;
 };
 
-map<string, int> id1;
-int id_cnt = 0;
+enum eDay {
+	eMonday = 0,
+	eTuesday,
+	eWednesday,
+	eThursday,
+	eFriday,
+	eSaturday,
+	eSunday,
+
+	eError = 7
+};
+
+map<string, int> idMap;
+int idCount = 0;
 
 //dat[사용자ID][요일]
-int dat[100][100];
-int points[100];
-int grade[100];
-string names[100];
+int attendanceCountPerDay[MAX_PLAYERS][MAX_DAYS];
+int points[MAX_PLAYERS];
+int grade[MAX_PLAYERS];
+string names[MAX_PLAYERS];
 
-int wed[100];
-int weeken[100];
+int wednesdayAttendance[100];
+int weekendAttendance[100];
 
-void input2(string w, string wk) {
-	//ID 부여
-	if (id1.count(w) == 0) {
-		id1.insert({ w, ++id_cnt });
+int getId(string name)
+{
+	// put given person in idMap and return his id
+	if (idMap.count(name) == 0) {
+		idMap.insert({ name, ++idCount });
 
-		if (w == "Daisy") {
+		if (name == "Daisy") {
 			int debug = 1;
 		}
 
-		names[id_cnt] = w;
+		names[idCount] = name;
 	}
-	int id2 = id1[w];
+	return idMap[name];
+}
+
+int getPoint(int id, string day)
+{
+	int add_point = 0;
+	int index = 0;
+	if (day == "monday") {
+		index = eMonday;
+		add_point++;
+	}
+	if (day == "tuesday") {
+		index = eTuesday;
+		add_point++;
+	}
+	if (day == "wednesday") {
+		index = eWednesday;
+		add_point += 3;
+		wednesdayAttendance[id] += 1;
+	}
+	if (day == "thursday") {
+		index = eThursday;
+		add_point++;
+	}
+	if (day == "friday") {
+		index = eFriday;
+		add_point++;
+	}
+	if (day == "saturday") {
+		index = eSaturday;
+		add_point += 2;
+		weekendAttendance[id] += 1;
+	}
+	if (day == "sunday") {
+		index = eSunday;
+		add_point += 2;
+		weekendAttendance[id] += 1;
+	}
+
+	return add_point;
+}
+
+eDay getAttendDay(string day)
+{
+	if (day == "monday") {
+		return eMonday;
+	}
+	if (day == "tuesday") {
+		return eTuesday;
+	}
+	if (day == "wednesday") {
+		return eWednesday;
+	}
+	if (day == "thursday") {
+		return eThursday;
+	}
+	if (day == "friday") {
+		return eFriday;
+	}
+	if (day == "saturday") {
+		return eSaturday;
+	}
+	if (day == "sunday") {
+		return eSunday;
+	}
+
+	return eError;
+}
+
+void makeAttendanceAndPointTable(string name, string day) {
+	//ID 부여
+	int id = getId(name);
 
 	//디버깅용
-	if (w == "Daisy") {
+	if (name == "Daisy") {
 		int debug = 1;
 	}
 
-
-	int add_point = 0;
-	int index = 0;
-	if (wk == "monday") {
-		index = 0;
-		add_point++;
-	}
-	if (wk == "tuesday") {
-		index = 1;
-		add_point++;
-	}
-	if (wk == "wednesday") {
-		index = 2;
-		add_point += 3;
-		wed[id2] += 1;
-	}
-	if (wk == "thursday") {
-		index = 3;
-		add_point++;
-	}
-	if (wk == "friday") {
-		index = 4;
-		add_point++;
-	}
-	if (wk == "saturday") {
-		index = 5;
-		add_point += 2;
-		weeken[id2] += 1;
-	}
-	if (wk == "sunday") {
-		index = 6;
-		add_point += 2;
-		weeken[id2] += 1;
-	}
+	int add_point = getPoint(id, day);
+	int index = getAttendDay(day);
 
 	//사용자ID별 요일 데이터에 1씩 증가
-	dat[id2][index] += 1;
-	points[id2] += add_point;
+	attendanceCountPerDay[id][index] += 1;
+	points[id] += add_point;
 }
 
 void input() {
 	ifstream fin{ "attendance_weekday_500.txt" }; //500개 데이터 입력
 	for (int i = 0; i < 500; i++) {
-		string t1, t2;
-		fin >> t1 >> t2;
-		input2(t1, t2);
+		string name, attendDay;
+		fin >> name >> attendDay;
+		makeAttendanceAndPointTable(name, attendDay);
 	}
 
-	for (int i = 1; i <= id_cnt; i++) {
-		if (dat[i][2] > 9) {
+	for (int i = 1; i <= idCount; i++) {
+		if (attendanceCountPerDay[i][2] > 9) {
 			points[i] += 10;
 		}
 
-		if (dat[i][5] + dat[i][6] > 9) {
+		if (attendanceCountPerDay[i][5] + attendanceCountPerDay[i][6] > 9) {
 			points[i] += 10;
 		}
 
@@ -127,9 +182,9 @@ void input() {
 	std::cout << "\n";
 	std::cout << "Removed player\n";
 	std::cout << "==============\n";
-	for (int i = 1; i <= id_cnt; i++) {
+	for (int i = 1; i <= idCount; i++) {
 
-		if (grade[i] != 1 && grade[i] != 2 && wed[i] == 0 && weeken[i] == 0) {
+		if (grade[i] != 1 && grade[i] != 2 && wednesdayAttendance[i] == 0 && weekendAttendance[i] == 0) {
 			std::cout << names[i] << "\n";
 		}
 	}
