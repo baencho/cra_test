@@ -19,19 +19,18 @@ public:
 	Player(string name, int id);
 	string getName(void);
 	int getId(void);
-	int getPoint(void);
-	void addPoint(int value);
 	int getGrade();
 
 	void updatePoint(int day);
 	void updateAttendance(int day);
 	int getAttendance(int day);
 	int calculateFinalPoint();
+	bool checkGradeNormal();
+	bool checkAttendanceNotEnough();
 
 private:
 	string name;
 	int id;
-	int point;
 	int finalPoint;
 	int attendPerDay[7] = { 0, 0, 0, 0, 0, 0, 0 };
 };

@@ -15,7 +15,6 @@ using namespace std;
 #define MAX_PLAYERS (100)
 #define MAX_DAYS (7)
 
-
 map<string, Player*> playerMap;
 
 string getGradeInString(int grade)
@@ -84,28 +83,13 @@ void printPointAndGrade() {
 	std::cout << "\n";
 }
 
-bool checkGradeNormal(Player* player)
-{
-	int grade = player->getGrade();
-	if (grade == eNormal) return true;
-	return false;
-}
-
-bool checkAttendanceNotEnough(Player* player)
-{
-	int wednesdayAttendance = player->getAttendance(eWednesday);
-	int weekendAttendance = player->getAttendance(eSaturday) + player->getAttendance(eSunday);
-	if (wednesdayAttendance == 0 && weekendAttendance == 0) return true;
-	return false;
-}
-
 void printRemovedPlayers() {
 	std::cout << "Removed player\n";
 	std::cout << "==============\n";
 	for (auto iter = playerMap.begin(); iter != playerMap.end(); iter++)
 	{
 		Player* player = iter->second;
-		if (checkGradeNormal(player) && checkAttendanceNotEnough(player)) {
+		if (player->checkGradeNormal() && player->checkAttendanceNotEnough()) {
 			std::cout << player->getName() << "\n";
 		}
 	}
@@ -118,9 +102,6 @@ void input(string filename) {
 		updateAttendance(name, attendDay);
 	}
 
-	//addExtraAttendancePointsWithPlayerMap();
-
-	// Print results
 	printPointAndGrade();
 	printRemovedPlayers();
 }
@@ -131,8 +112,19 @@ void ResetAllData(){
 
 class TestFixture : public ::testing::Test
 {
+public:
 	void SetUp() override {
 		ResetAllData();
+	}
+
+	void getInputAndUpdateAttendance() {
+		string filename = "attendance_weekday_500.txt";
+		ifstream fin{ filename }; //500개 데이터 입력
+		for (int i = 0; i < 500; i++) {
+			string name, attendDay;
+			fin >> name >> attendDay;
+			updateAttendance(name, attendDay);
+		}
 	}
 };
 
@@ -186,13 +178,7 @@ TEST_F(TestFixture, CheckUpdateAttendance)
 TEST_F(TestFixture, CheckAttendanceInputWellManaged)
 {
 	try {
-		string filename = "attendance_weekday_500.txt";
-		ifstream fin{ filename }; //500개 데이터 입력
-		for (int i = 0; i < 500; i++) {
-			string name, attendDay;
-			fin >> name >> attendDay;
-			updateAttendance(name, attendDay);
-		}
+		getInputAndUpdateAttendance();
 	}
 	catch (exception e) {
 		std::cout << e.what() << "\n";
@@ -204,13 +190,7 @@ TEST_F(TestFixture, CheckAttendanceInputWellManaged)
 TEST_F(TestFixture, CheckPointWellCalculated)
 {
 	try {
-		string filename = "attendance_weekday_500.txt";
-		ifstream fin{ filename }; //500개 데이터 입력
-		for (int i = 0; i < 500; i++) {
-			string name, attendDay;
-			fin >> name >> attendDay;
-			updateAttendance(name, attendDay);
-		}
+		getInputAndUpdateAttendance();
 	}
 	catch (exception e) {
 		std::cout << e.what() << "\n";
@@ -222,13 +202,7 @@ TEST_F(TestFixture, CheckPointWellCalculated)
 TEST_F(TestFixture, CalculateOnceTest)
 {
 	try {
-		string filename = "attendance_weekday_500.txt";
-		ifstream fin{ filename }; //500개 데이터 입력
-		for (int i = 0; i < 500; i++) {
-			string name, attendDay;
-			fin >> name >> attendDay;
-			updateAttendance(name, attendDay);
-		}
+		getInputAndUpdateAttendance();
 	}
 	catch (exception e) {
 		std::cout << e.what() << "\n";
@@ -240,13 +214,7 @@ TEST_F(TestFixture, CalculateOnceTest)
 TEST_F(TestFixture, CheckGradeWellCalculated)
 {
 	try {
-		string filename = "attendance_weekday_500.txt";
-		ifstream fin{ filename }; //500개 데이터 입력
-		for (int i = 0; i < 500; i++) {
-			string name, attendDay;
-			fin >> name >> attendDay;
-			updateAttendance(name, attendDay);
-		}
+		getInputAndUpdateAttendance();
 	}
 	catch (exception e) {
 		std::cout << e.what() << "\n";
