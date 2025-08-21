@@ -24,11 +24,18 @@
     <ClCompile Include="test.cpp">
       <Filter>테스트 파일</Filter>
     </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\lib\native\src\gtest\gtest-all.cc">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\lib\native\src\gmock\gmock-all.cc">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Text Include="attendance_weekday_500.txt">
       <Filter>리소스 파일</Filter>
     </Text>
+    <Text Include="answer.txt" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

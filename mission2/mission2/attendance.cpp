@@ -1,4 +1,4 @@
-#include <iostream>
+ï»¿#include <iostream>
 #include <fstream>
 #include <string>
 #include <vector>
@@ -8,8 +8,7 @@
 #include "gmock/gmock.h"
 
 using namespace std;
-
-#define OP_TEST (0)
+#define OP_TEST (1)
 
 #define MAX_PLAYERS (100)
 #define MAX_DAYS (7)
@@ -40,7 +39,7 @@ enum eGrade {
 map<string, int> idMap;
 int idCount = 0;
 
-//dat[»ç¿ëÀÚID][¿äÀÏ]
+//dat[ì‚¬ìš©ìID][ìš”ì¼]
 int attendanceCountPerDay[MAX_PLAYERS][MAX_DAYS + 1];
 int points[MAX_PLAYERS];
 int grade[MAX_PLAYERS];
@@ -157,7 +156,7 @@ void updateAttendanceCountPerDayTable(int id, int day)
 void updateAttendanceAndPointTable(string name, string dayInString) {
 	int id = getId(name);
 
-	//µğ¹ö±ë¿ë
+	//ë””ë²„ê¹…ìš©
 	if (name == "Daisy") {
 		int debug = 1;
 	}
@@ -232,7 +231,7 @@ void printRemovedPlayers() {
 	}
 }
 void input(string filename) {
-	ifstream fin{ filename }; //500°³ µ¥ÀÌÅÍ ÀÔ·Â
+	ifstream fin{ filename }; //500ê°œ ë°ì´í„° ì…ë ¥
 	for (int i = 0; i < 500; i++) {
 		string name, attendDay;
 		fin >> name >> attendDay;
@@ -248,8 +247,71 @@ void input(string filename) {
 	printRemovedPlayers();
 }
 
+void ResetAllData(){
+	idMap.clear();
+	idCount = 0;
+
+	//dat[ì‚¬ìš©ìID][ìš”ì¼]
+	memset(attendanceCountPerDay, 0, sizeof(int) * MAX_PLAYERS * (MAX_DAYS + 1));
+	memset(points, 0, sizeof(int) * MAX_PLAYERS);
+	memset(grade, 0, sizeof(int) * MAX_PLAYERS);
+	
+	for (int i = 0; i < MAX_PLAYERS; i++)
+	{
+		names[i] = "";
+	}
+
+	memset(wednesdayAttendance, 0, sizeof(int) * MAX_PLAYERS);
+	memset(weekendAttendance, 0, sizeof(int) * MAX_PLAYERS);
+}
+
+class TestFixture : public ::testing::Test
+{
+	void SetUp() override {
+		ResetAllData();
+	}
+};
+
+// Test ì •ì˜
+TEST_F(TestFixture, CheckRemovedPlayersRight)
+{
+	testing::internal::CaptureStdout();
+	
+	try {
+		string filename = "attendance_weekday_500.txt";
+		input(filename);
+	}
+	catch (exception e) {
+		std::cout << e.what() << "\n";
+	}
+
+	string output = testing::internal::GetCapturedStdout();
+
+	string line;
+	ifstream answerFile("answer.txt");
+	if (!answerFile.is_open()) {
+		cerr << "Could not open the file" << endl;
+	}
+
+	while (getline(answerFile, line)) {
+		EXPECT_THAT(output, ::testing::HasSubstr(line));
+	}
+}
+
+TEST_F(TestFixture, CheckGetIdProcess)
+{
+	int id = getId("Ian");
+	int id2 = getId("Ian"); // expect same id
+	int id3 = getId("Susan");
+
+	EXPECT_EQ(1, id);
+	EXPECT_EQ(1, id2);
+	EXPECT_EQ(2, id3);
+	EXPECT_EQ(2, idCount);
+}
+
 int main() {
-#if (1 == OP_TEST)
+#if (1)
 	::testing::InitGoogleMock();
 	return RUN_ALL_TESTS();
 #else
