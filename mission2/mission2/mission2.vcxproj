@@ -129,8 +129,6 @@
     </ClCompile>
     <ClCompile Include="grade.cpp" />
     <ClCompile Include="player.cpp" />
-    <ClCompile Include="playerFactory.cpp" />
-    <ClCompile Include="test.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="answer.txt" />

@@ -10,7 +10,7 @@
 #include "grade.h"
 
 using namespace std;
-#define OP_TEST (0)
+#define OP_TEST (1)
 
 class StringConverter {
 private:
