@@ -15,5 +15,4 @@ int PointGrade::getGrade()
 	else {
 		return eNormal;
 	}
-	return grade;
 }

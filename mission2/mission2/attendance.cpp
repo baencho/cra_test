@@ -12,22 +12,12 @@
 using namespace std;
 #define OP_TEST (1)
 
-#define MAX_PLAYERS (100)
-#define MAX_DAYS (7)
-
 map<string, Player*> playerMap;
 
 string getGradeInString(int grade)
 {
-	if (grade == eGold) {
-		return "GOLD";
-	}
-	else if (grade == eSilver) {
-		return "SILVER";
-	}
-	else {
-		return "NORMAL";
-	}
+	const string gradeString[3] = { "NORMAL" , "GOLD", "SILVER" };
+	return gradeString[grade];
 }
 
 eDay convertDayStringToInt(string day)
@@ -133,13 +123,8 @@ TEST_F(TestFixture, CheckRemovedPlayersRight)
 {
 	testing::internal::CaptureStdout();
 	
-	try {
-		string filename = "attendance_weekday_500.txt";
-		input(filename);
-	}
-	catch (exception e) {
-		std::cout << e.what() << "\n";
-	}
+	string filename = "attendance_weekday_500.txt";
+	input(filename);
 
 	string output = testing::internal::GetCapturedStdout();
 
@@ -177,54 +162,62 @@ TEST_F(TestFixture, CheckUpdateAttendance)
 
 TEST_F(TestFixture, CheckAttendanceInputWellManaged)
 {
-	try {
-		getInputAndUpdateAttendance();
-	}
-	catch (exception e) {
-		std::cout << e.what() << "\n";
-	}
+	getInputAndUpdateAttendance();
 
 	EXPECT_EQ(19, playerMap.size());
 }
 
 TEST_F(TestFixture, CheckPointWellCalculated)
 {
-	try {
-		getInputAndUpdateAttendance();
-	}
-	catch (exception e) {
-		std::cout << e.what() << "\n";
-	}
+	getInputAndUpdateAttendance();
+
 	EXPECT_EQ(19, playerMap.size());
 	EXPECT_EQ(127, playerMap["Hannah"]->calculateFinalPoint());
 }
 
 TEST_F(TestFixture, CalculateOnceTest)
 {
-	try {
-		getInputAndUpdateAttendance();
-	}
-	catch (exception e) {
-		std::cout << e.what() << "\n";
-	}
+	getInputAndUpdateAttendance();
+
 	EXPECT_EQ(19, playerMap.size());
 	EXPECT_EQ(127, playerMap["Hannah"]->calculateFinalPoint());
 }
 
 TEST_F(TestFixture, CheckGradeWellCalculated)
 {
-	try {
-		getInputAndUpdateAttendance();
-	}
-	catch (exception e) {
-		std::cout << e.what() << "\n";
-	}
+	getInputAndUpdateAttendance();
+
 	EXPECT_EQ(19, playerMap.size());
 	EXPECT_EQ(eGold, playerMap["Hannah"]->getGrade());
 	EXPECT_EQ(eSilver, playerMap["George"]->getGrade());
 	EXPECT_EQ(eNormal, playerMap["Quinn"]->getGrade());
 }
 
+TEST_F(TestFixture, CheckGradeNormal)
+{
+	Player p("Jonh", 0);
+	p.updateAttendance(eWednesday);
+	p.updateAttendance(eWednesday);
+	p.updateAttendance(eWednesday);
+	p.updateAttendance(eWednesday);
+	p.updateAttendance(eWednesday);
+	p.updateAttendance(eWednesday);
+	p.updateAttendance(eWednesday);
+	p.updateAttendance(eWednesday);
+	p.updateAttendance(eWednesday);
+	p.updateAttendance(eWednesday);
+	EXPECT_EQ(false, p.checkGradeNormal());	
+}
+
+TEST_F(TestFixture, CheckAttendanceNormal)
+{
+	Player p("Jonh", 0);
+	p.updateAttendance(eWednesday);
+	p.updateAttendance(eWednesday);
+	p.updateAttendance(eWednesday);
+	
+	EXPECT_EQ(false, p.checkAttendanceNotEnough());
+}
 int main() {
 #if (1)
 	::testing::InitGoogleMock();

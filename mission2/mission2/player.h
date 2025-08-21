@@ -1,6 +1,6 @@
 #pragma once
 #include <string>
-
+#define MAX_DAYS (7)
 using namespace std;
 enum eDay {
 	eMonday = 0,
@@ -11,7 +11,7 @@ enum eDay {
 	eSaturday,
 	eSunday,
 
-	eDayError = 7
+	eDayError = MAX_DAYS
 };
 class Player
 {
@@ -21,7 +21,6 @@ public:
 	int getId(void);
 	int getGrade();
 
-	void updatePoint(int day);
 	void updateAttendance(int day);
 	int getAttendance(int day);
 	int calculateFinalPoint();
@@ -31,6 +30,5 @@ public:
 private:
 	string name;
 	int id;
-	int finalPoint;
-	int attendPerDay[7] = { 0, 0, 0, 0, 0, 0, 0 };
+	int attendPerDay[MAX_DAYS] = { 0, 0, 0, 0, 0, 0, 0 };
 };

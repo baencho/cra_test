@@ -39,9 +39,9 @@ int Player::getAttendance(int day)
 int Player::calculateFinalPoint()
 {
 	int finalPoint = 0;
-	const int pointPerDay[7] = { 1, 1, 3, 1, 1, 2, 2 };
-	for (int i = 0; i < 7; i++) {
-		finalPoint += attendPerDay[i] * pointPerDay[i];
+	const int pointPerDay[MAX_DAYS] = { 1, 1, 3, 1, 1, 2, 2 };
+	for (int day = 0; day < MAX_DAYS; day++) {
+		finalPoint += attendPerDay[day] * pointPerDay[day];
 	}
 	if (attendPerDay[eWednesday] > 9) finalPoint += 10;
 	if (attendPerDay[eSaturday] + attendPerDay[eSunday] > 9) finalPoint += 10;
@@ -51,8 +51,12 @@ int Player::calculateFinalPoint()
 
 bool Player::checkGradeNormal()
 {
-	if (getGrade() == eNormal) return true;
-	return false;
+	if (getGrade() == eNormal) {
+		return true;
+	}
+	else {
+		return false;
+	}
 }
 
 bool Player::checkAttendanceNotEnough()
@@ -62,5 +66,7 @@ bool Player::checkAttendanceNotEnough()
 	{
 		return true;
 	}
-	return false;
+	else {
+		return false;
+	}
 }
