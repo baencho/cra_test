@@ -49,6 +49,35 @@ string names[MAX_PLAYERS];
 int wednesdayAttendance[MAX_PLAYERS];
 int weekendAttendance[MAX_PLAYERS];
 
+string getGradeInString(int id)
+{
+	if (grade[id] == eGold) {
+		return "GOLD";
+	}
+	else if (grade[id] == eSilver) {
+		return "SILVER";
+	}
+	else {
+		return "NORMAL";
+	}
+}
+
+string getName(int id)
+{
+	return names[id];
+}
+
+int getPoint(int id)
+{
+	return points[id];
+}
+
+int getPointPerDay(int id, int day)
+{
+	const int pointPerDay[MAX_DAYS] = { 1, 1, 3, 1, 1, 2, 2 };
+	return pointPerDay[day];
+}
+
 int getId(string name)
 {
 	// put given person in idMap and return his id
@@ -62,12 +91,6 @@ int getId(string name)
 		names[idCount] = name;
 	}
 	return idMap[name];
-}
-
-int getPoint(int id, int day)
-{
-	const int pointPerDay[MAX_DAYS] = { 1, 1, 3, 1, 1, 2, 2 };
-	return pointPerDay[day];
 }
 
 eDay convertDayStringToInt(string day)
@@ -101,7 +124,7 @@ void updatePointTable(int id, int day) {
 	if (id < 0 || id >= MAX_PLAYERS) throw exception("[updatePointTable] id overflow exception");
 	if (day < eMonday || day >= eDayError) throw exception("[updatePointTable] day overflow exception");
 
-	points[id] += getPoint(id, day);
+	points[id] += getPointPerDay(id, day);
 }
 
 void updateExtraAttendanceTable(int id, int day)
@@ -140,7 +163,7 @@ void updateAttendanceAndPointTable(string name, string dayInString) {
 	}
 
 	int dayInInt = convertDayStringToInt(dayInString);
-	
+
 	updatePointTable(id, dayInInt);
 
 	updateExtraAttendanceTable(id, dayInInt);
@@ -178,29 +201,6 @@ void updateGradeTable() {
 	}
 }
 
-string getGradeInString(int id)
-{
-	if (grade[id] == eGold) {
-		return "GOLD";
-	}
-	else if (grade[id] == eSilver) {
-		return "SILVER";
-	}
-	else {
-		return "NORMAL";
-	}
-}
-
-string getName(int id)
-{
-	return names[id];
-}
-
-int getPoint(int id)
-{
-	return points[id];
-}
-
 void printPointAndGrade() {
 	for (int id = 1; id <= idCount; id++) {
 		cout << "NAME : " << getName(id) << ", ";
@@ -231,7 +231,6 @@ void printRemovedPlayers() {
 		}
 	}
 }
-
 void input(string filename) {
 	ifstream fin{ filename }; //500개 데이터 입력
 	for (int i = 0; i < 500; i++) {
