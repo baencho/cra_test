@@ -10,7 +10,7 @@
 #include "grade.h"
 
 using namespace std;
-#define OP_TEST (1)
+#define OP_TEST (0)
 
 class StringConverter {
 private:
@@ -245,12 +245,7 @@ int main() {
 	::testing::InitGoogleMock();
 	return RUN_ALL_TESTS();
 #else
-	try {
-		string filename = "attendance_weekday_500.txt";
-		input(filename);
-	}
-	catch (exception e) {
-		std::cout << e.what() << "\n";
-	}
+	string filename = "attendance_weekday_500.txt";
+	input(filename);
 #endif
 }
