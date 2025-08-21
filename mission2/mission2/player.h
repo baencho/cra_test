@@ -2,7 +2,17 @@
 #include <string>
 
 using namespace std;
+enum eDay {
+	eMonday = 0,
+	eTuesday,
+	eWednesday,
+	eThursday,
+	eFriday,
+	eSaturday,
+	eSunday,
 
+	eDayError = 7
+};
 class Player
 {
 public:
@@ -16,10 +26,12 @@ public:
 	void updatePoint(int day);
 	void updateAttendance(int day);
 	int getAttendance(int day);
+	int calculateFinalPoint();
 
 private:
 	string name;
 	int id;
 	int point;
+	int finalPoint;
 	int attendPerDay[7] = { 0, 0, 0, 0, 0, 0, 0 };
 };

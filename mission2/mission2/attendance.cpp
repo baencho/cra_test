@@ -15,17 +15,6 @@ using namespace std;
 #define MAX_PLAYERS (100)
 #define MAX_DAYS (7)
 
-enum eDay {
-	eMonday = 0,
-	eTuesday,
-	eWednesday,
-	eThursday,
-	eFriday,
-	eSaturday,
-	eSunday,
-
-	eDayError = 7
-};
 
 map<string, Player*> playerMap;
 
@@ -244,6 +233,26 @@ TEST_F(TestFixture, CheckPointWellCalculated)
 	}
 	EXPECT_EQ(19, playerMap.size());
 	EXPECT_EQ(127, playerMap["Hannah"]->getPoint());
+}
+
+TEST_F(TestFixture, CalculateOnceTest)
+{
+	try {
+		string filename = "attendance_weekday_500.txt";
+		ifstream fin{ filename }; //500개 데이터 입력
+		for (int i = 0; i < 500; i++) {
+			string name, attendDay;
+			fin >> name >> attendDay;
+			int dayInInt = convertDayStringToInt(attendDay);
+			Player* player = getPlayer(name);
+			player->updateAttendance(dayInInt);
+		}
+	}
+	catch (exception e) {
+		std::cout << e.what() << "\n";
+	}
+	EXPECT_EQ(19, playerMap.size());
+	EXPECT_EQ(127, playerMap["Hannah"]->calculateFinalPoint());
 }
 
 TEST_F(TestFixture, CheckGradeWellCalculated)
