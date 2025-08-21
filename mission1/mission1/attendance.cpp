@@ -57,35 +57,23 @@ int getId(string name)
 	return idMap[name];
 }
 
-int getPoint(int id, string day)
+int getPoint(int id, int day)
 {
-	int add_point = 0;
-	if (day == "monday") {
-		add_point++;
-	}
-	if (day == "tuesday") {
-		add_point++;
-	}
-	if (day == "wednesday") {
-		add_point += 3;
+	const int pointPerDay[7] = { 1, 1, 3, 1, 1, 2, 2 };
+	return pointPerDay[day];
+}
+
+void updateExtraAttendanceCount(int id, int day)
+{
+	if (day == eWednesday) {
 		wednesdayAttendance[id] += 1;
 	}
-	if (day == "thursday") {
-		add_point++;
-	}
-	if (day == "friday") {
-		add_point++;
-	}
-	if (day == "saturday") {
-		add_point += 2;
+	if (day == eSaturday) {
 		weekendAttendance[id] += 1;
 	}
-	if (day == "sunday") {
-		add_point += 2;
+	if (day == eSunday) {
 		weekendAttendance[id] += 1;
 	}
-
-	return add_point;
 }
 
 eDay getAttendDay(string day)
@@ -115,7 +103,17 @@ eDay getAttendDay(string day)
 	return eError;
 }
 
-void makeAttendanceAndPointTable(string name, string day) {
+void updatePointTable(int id, int day) {
+	int add_point = getPoint(id, day);
+	points[id] += add_point;
+}
+
+void updateAttendanceCountPerDay(int id, int day)
+{
+	attendanceCountPerDay[id][day] += 1;
+}
+
+void makeAttendanceAndPointTable(string name, string dayInString) {
 	//ID 부여
 	int id = getId(name);
 
@@ -124,23 +122,25 @@ void makeAttendanceAndPointTable(string name, string day) {
 		int debug = 1;
 	}
 
-	int add_point = getPoint(id, day);
-	int index = getAttendDay(day);
+	int dayInInt = getAttendDay(dayInString);
+	
+	updatePointTable(id, dayInInt);
+
+	updateExtraAttendanceCount(id, dayInInt);
 
 	//사용자ID별 요일 데이터에 1씩 증가
-	attendanceCountPerDay[id][index] += 1;
-	points[id] += add_point;
+	updateAttendanceCountPerDay(id, dayInInt);
 }
 
 void addExtraAttendancePoints()
 {
-	for (int i = 1; i <= idCount; i++) {
-		if (attendanceCountPerDay[i][2] > 9) {
-			points[i] += 10;
+	for (int id = 1; id <= idCount; id++) {
+		if (attendanceCountPerDay[id][eWednesday] > 9) {
+			points[id] += 10;
 		}
 
-		if (attendanceCountPerDay[i][5] + attendanceCountPerDay[i][6] > 9) {
-			points[i] += 10;
+		if (attendanceCountPerDay[id][eSaturday] + attendanceCountPerDay[id][eSunday] > 9) {
+			points[id] += 10;
 		}
 	}
 }
@@ -181,10 +181,10 @@ void printPointAndGrade() {
 void printRemovedPlayers() {
 	std::cout << "Removed player\n";
 	std::cout << "==============\n";
-	for (int i = 1; i <= idCount; i++) {
+	for (int id = 1; id <= idCount; id++) {
 
-		if (grade[i] != 1 && grade[i] != 2 && wednesdayAttendance[i] == 0 && weekendAttendance[i] == 0) {
-			std::cout << names[i] << "\n";
+		if (grade[id] != 1 && grade[id] != 2 && wednesdayAttendance[id] == 0 && weekendAttendance[id] == 0) {
+			std::cout << names[id] << "\n";
 		}
 	}
 }
