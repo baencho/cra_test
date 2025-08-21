@@ -13,13 +13,25 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="테스트 파일">
+      <UniqueIdentifier>{e0fd06d8-e7a6-418b-ba85-7afe0de9b808}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="attendance.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
+    <ClCompile Include="test1.cpp">
+      <Filter>테스트 파일</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <Text Include="attendance_weekday_500.txt" />
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="attendance_weekday_500.txt">
+      <Filter>리소스 파일</Filter>
+    </Text>
+    <Text Include="test_input1.txt" />
   </ItemGroup>
 </Project>
