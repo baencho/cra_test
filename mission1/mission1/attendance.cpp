@@ -1,4 +1,4 @@
-#include <iostream>
+ï»¿#include <iostream>
 #include <fstream>
 #include <string>
 #include <vector>
@@ -11,7 +11,7 @@ using namespace std;
 #define OP_TEST (0)
 
 #define MAX_PLAYERS (100)
-#define MAX_DAYS (100)
+#define MAX_DAYS (7)
 
 struct Node {
 	string name;
@@ -30,17 +30,23 @@ enum eDay {
 	eError = 7
 };
 
+enum eGrade {
+	eNormal = 0,
+	eGold = 1,
+	eSilver = 2
+};
+
 map<string, int> idMap;
 int idCount = 0;
 
-//dat[»ç¿ëÀÚID][¿äÀÏ]
-int attendanceCountPerDay[MAX_PLAYERS][MAX_DAYS];
+//dat[ì‚¬ìš©ìID][ìš”ì¼]
+int attendanceCountPerDay[MAX_PLAYERS][MAX_DAYS + 1];
 int points[MAX_PLAYERS];
 int grade[MAX_PLAYERS];
 string names[MAX_PLAYERS];
 
-int wednesdayAttendance[100];
-int weekendAttendance[100];
+int wednesdayAttendance[MAX_PLAYERS];
+int weekendAttendance[MAX_PLAYERS];
 
 int getId(string name)
 {
@@ -63,20 +69,7 @@ int getPoint(int id, int day)
 	return pointPerDay[day];
 }
 
-void updateExtraAttendanceCount(int id, int day)
-{
-	if (day == eWednesday) {
-		wednesdayAttendance[id] += 1;
-	}
-	if (day == eSaturday) {
-		weekendAttendance[id] += 1;
-	}
-	if (day == eSunday) {
-		weekendAttendance[id] += 1;
-	}
-}
-
-eDay getAttendDay(string day)
+eDay convertDayStringToInt(string day)
 {
 	if (day == "monday") {
 		return eMonday;
@@ -104,32 +97,42 @@ eDay getAttendDay(string day)
 }
 
 void updatePointTable(int id, int day) {
-	int add_point = getPoint(id, day);
-	points[id] += add_point;
+	points[id] += getPoint(id, day);
 }
 
-void updateAttendanceCountPerDay(int id, int day)
+void updateExtraAttendanceTable(int id, int day)
+{
+	if (day == eWednesday) {
+		wednesdayAttendance[id] += 1;
+	}
+	if (day == eSaturday) {
+		weekendAttendance[id] += 1;
+	}
+	if (day == eSunday) {
+		weekendAttendance[id] += 1;
+	}
+}
+
+void updateAttendanceCountPerDayTable(int id, int day)
 {
 	attendanceCountPerDay[id][day] += 1;
 }
 
-void makeAttendanceAndPointTable(string name, string dayInString) {
-	//ID ºÎ¿©
+void updateAttendanceAndPointTable(string name, string dayInString) {
 	int id = getId(name);
 
-	//µğ¹ö±ë¿ë
+	//ë””ë²„ê¹…ìš©
 	if (name == "Daisy") {
 		int debug = 1;
 	}
 
-	int dayInInt = getAttendDay(dayInString);
+	int dayInInt = convertDayStringToInt(dayInString);
 	
 	updatePointTable(id, dayInInt);
 
-	updateExtraAttendanceCount(id, dayInInt);
+	updateExtraAttendanceTable(id, dayInInt);
 
-	//»ç¿ëÀÚIDº° ¿äÀÏ µ¥ÀÌÅÍ¿¡ 1¾¿ Áõ°¡
-	updateAttendanceCountPerDay(id, dayInInt);
+	updateAttendanceCountPerDayTable(id, dayInInt);
 }
 
 void addExtraAttendancePoints()
@@ -146,62 +149,87 @@ void addExtraAttendancePoints()
 }
 
 void updateGradeTable() {
-	for (int i = 1; i <= idCount; i++) {
-		if (points[i] >= 50) {
-			grade[i] = 1;
+	for (int id = 1; id <= idCount; id++) {
+		if (points[id] >= 50) {
+			grade[id] = eGold;
 		}
-		else if (points[i] >= 30) {
-			grade[i] = 2;
+		else if (points[id] >= 30) {
+			grade[id] = eSilver;
 		}
 		else {
-			grade[i] = 0;
+			grade[id] = eNormal;
 		}
 	}
 }
 
-void printPointAndGrade() {
-	for (int i = 1; i <= idCount; i++) {
-		cout << "NAME : " << names[i] << ", ";
-		cout << "POINT : " << points[i] << ", ";
-		cout << "GRADE : ";
+string getGradeInString(int id)
+{
+	if (grade[id] == eGold) {
+		return "GOLD";
+	}
+	else if (grade[id] == eSilver) {
+		return "SILVER";
+	}
+	else {
+		return "NORMAL";
+	}
+}
 
-		if (grade[i] == 1) {
-			cout << "GOLD" << "\n";
-		}
-		else if (grade[i] == 2) {
-			cout << "SILVER" << "\n";
-		}
-		else {
-			cout << "NORMAL" << "\n";
-		}
+string getName(int id)
+{
+	return names[id];
+}
+
+int getPoint(int id)
+{
+	return points[id];
+}
+
+void printPointAndGrade() {
+	for (int id = 1; id <= idCount; id++) {
+		cout << "NAME : " << getName(id) << ", ";
+		cout << "POINT : " << getPoint(id) << ", ";
+		cout << "GRADE : " << getGradeInString(id) << "\n";
 	}
 	std::cout << "\n";
+}
+
+bool checkGradeNormal(int id)
+{
+	if (grade[id] != eGold && grade[id] != eSilver) return true;
+	return false;
+}
+
+bool checkAttendanceNotEnough(int id)
+{
+	if (wednesdayAttendance[id] == 0 && weekendAttendance[id] == 0) return true;
+	return false;
 }
 
 void printRemovedPlayers() {
 	std::cout << "Removed player\n";
 	std::cout << "==============\n";
 	for (int id = 1; id <= idCount; id++) {
-
-		if (grade[id] != 1 && grade[id] != 2 && wednesdayAttendance[id] == 0 && weekendAttendance[id] == 0) {
+		if (checkGradeNormal(id) && checkAttendanceNotEnough(id)) {
 			std::cout << names[id] << "\n";
 		}
 	}
 }
+
 void input(string filename) {
-	ifstream fin{ filename }; //500°³ µ¥ÀÌÅÍ ÀÔ·Â
+	ifstream fin{ filename }; //500ê°œ ë°ì´í„° ì…ë ¥
 	for (int i = 0; i < 500; i++) {
 		string name, attendDay;
 		fin >> name >> attendDay;
-		makeAttendanceAndPointTable(name, attendDay);
+		updateAttendanceAndPointTable(name, attendDay);
 	}
 
 	addExtraAttendancePoints();
 
 	updateGradeTable();
 
+	// Print results
 	printPointAndGrade();
-	
 	printRemovedPlayers();
 }
 
