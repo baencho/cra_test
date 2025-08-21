@@ -6,6 +6,7 @@
 #include <algorithm>
 #include <exception>
 #include "gmock/gmock.h"
+#include "player.h"
 
 using namespace std;
 #define OP_TEST (1)
@@ -37,6 +38,7 @@ enum eGrade {
 };
 
 map<string, int> idMap;
+map<string, Player*> playerMap;
 int idCount = 0;
 
 //dat[사용자ID][요일]
@@ -153,14 +155,17 @@ void updateAttendanceCountPerDayTable(int id, int day)
 	attendanceCountPerDay[id][day] += 1;
 }
 
+Player* getPlayer(string name)
+{
+	if (playerMap.count(name) == 0) {
+		//insert in map
+		playerMap.insert({ name, new Player(name, playerMap.size() + 1) });
+	}
+	return playerMap[name];
+}
+
 void updateAttendanceAndPointTable(string name, string dayInString) {
 	int id = getId(name);
-
-	//디버깅용
-	if (name == "Daisy") {
-		int debug = 1;
-	}
-
 	int dayInInt = convertDayStringToInt(dayInString);
 
 	updatePointTable(id, dayInInt);
@@ -168,6 +173,13 @@ void updateAttendanceAndPointTable(string name, string dayInString) {
 	updateExtraAttendanceTable(id, dayInInt);
 
 	updateAttendanceCountPerDayTable(id, dayInInt);
+}
+
+void updateAttendance(string name, string dayInString) {
+	int dayInInt = convertDayStringToInt(dayInString);
+	Player* player = getPlayer(name);
+	player->updateAttendance(dayInInt);
+	player->updatePoint(dayInInt);
 }
 
 void addExtraAttendancePoints()
@@ -308,6 +320,15 @@ TEST_F(TestFixture, CheckGetIdProcess)
 	EXPECT_EQ(1, id2);
 	EXPECT_EQ(2, id3);
 	EXPECT_EQ(2, idCount);
+}
+
+TEST_F(TestFixture, CheckUpdateAttendance)
+{
+	updateAttendance("Harry", "wednesday");
+	EXPECT_EQ(1, playerMap.size());
+	EXPECT_EQ("Harry", playerMap["Harry"]->getName());
+	EXPECT_EQ(1, playerMap["Harry"]->getId());
+	EXPECT_EQ(1, playerMap["Harry"]->getAttendance(eWednesday));
 }
 
 int main() {
